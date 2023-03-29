@@ -3,6 +3,8 @@ const mysql = require("mysql2");
 
 const db = require("./db/connection");
 const inquirer = require("inquirer");
+// require("console.table");
+
 
 const menuOptions = () => {
   inquirer
@@ -93,8 +95,8 @@ async function viewAllEmployees() {
     console.log("\n");
     console.table(employees);
     await menuOptions();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.err(err);
   }
 }
 
@@ -136,8 +138,8 @@ async function updateEmployeeRole() {
     await db.updateEmployeeRole(employeeId, roleId);
     console.log("Updated employee's role");
     await menuOptions();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
   }
 }
 // view roles
@@ -148,8 +150,8 @@ async function viewAllRoles() {
     console.log("\n");
     console.table(roles);
     await menuOptions();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
   }
 }
   
@@ -205,11 +207,11 @@ async function addEmployee() {
     await db.createEmployee(newEmployee);
     console.log(`Added ${newEmployee.first_name} ${newEmployee.last_name} to the database`);
     await menuOptions();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
   }
 }
-
+// add a department
 async function addDepartment() {
   try {
     const department = await prompt([
@@ -222,8 +224,43 @@ async function addDepartment() {
     await db.createDepartment(name);
     console.log(`Added ${name} to the database`);
     await menuOptions();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
+}
+// add a role
+
+async function addRole() {
+  try {
+    const [rows] = await db.findAllDepartments();
+    let departments = rows;
+    const departmentChoices = departments.map(({ id, name }) => ({
+      name: name,
+      value: id,
+    }));
+
+    const role = await prompt([
+      {
+        name: "title",
+        message: "What is the name of the role?",
+      },
+      {
+        name: "salary",
+        message: "What is the salary of the role?",
+      },
+      {
+        type: "list",
+        name: "department_id",
+        message: "Which department does the role belong to?",
+        choices: departmentChoices,
+      },
+    ]);
+
+    await db.createRole(role);
+    console.log(`Added ${role.title} to the database`);
+    await menuOptions();
+  } catch (err) {
+    console.log(err);
   }
 }
 
