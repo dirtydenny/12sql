@@ -231,3 +231,5 @@ function quit(){
   console.log("Back to Work!");
   process.exit();
 }
+
+menuOptions();
